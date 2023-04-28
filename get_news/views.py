@@ -1,4 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
+from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
 
 
@@ -6,18 +7,15 @@ import feedparser
 from datetime import datetime
 
 from .models import News
+
 import spacy
-import nltk
 from nltk.corpus import wordnet as wn
 from collections import defaultdict
 from .identifyModel.SVM import clf, vectorizer
 from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
-    
-    return render(request, 'index.html', {
-        "articles": News.objects.all()
-    })
+    return render(request, 'index.html')
     
 
 def news(request):
@@ -194,8 +192,8 @@ def news(request):
                     i += 1
                 except IntegrityError:
                     pass
-    return HttpResponse(f"Recibidos {i} artículos.")
 
+    return HttpResponse(f"Recibidos {i} artículos.")
 
 @csrf_exempt
 def valid_new(request):
@@ -245,4 +243,8 @@ def valid_new(request):
             
                 
         return HttpResponse("validar noticias")
+
+
+
+    
 
