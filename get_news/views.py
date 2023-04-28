@@ -14,7 +14,6 @@ from nltk.corpus import wordnet as wn
 from collections import defaultdict
 
 def index(request):
-    print(News.objects.all()[:9])
     return render(request, 'index.html', {
         "articles": News.objects.all()[:9]
     })
