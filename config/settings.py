@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-35-_k=2k)-+k)+wiq2#ba1(li_ka&09!22f*+0n!7cj74ynse-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['fakenewsdetectorserviceapp.azurewebsites.net']
 
 
 # Application definition
