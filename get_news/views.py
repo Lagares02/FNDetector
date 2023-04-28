@@ -9,6 +9,8 @@ from datetime import datetime
 from .models import News
 
 import spacy
+import nltk
+nltk.download('wordnet')
 from nltk.corpus import wordnet as wn
 from collections import defaultdict
 from .identifyModel.SVM import clf, vectorizer
