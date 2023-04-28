@@ -219,28 +219,53 @@ def news(request):
     return HttpResponse(f"Recibidos {i} artículos.")
 
 
+
+@csrf_exempt
 def valid_new(request):
      if request.method =="POST":
         # Carga del modelo en español
-        nlp = spacy.load("es_core_news_md")
+        nlp = spacy.load("es_core_news_sm")
+
+        texto = request.POST["text"]
+        print(texto)
+        # Procesamiento del texto
+        doc = nlp(texto)
+
+        # Tokenización
+        print("Tokenización:")
+        for token in doc:
+            print(token.text)
+
+        # Análisis de entidades
+        print("\nEntidades:")
+        for entidad in doc.ents:
+            print(entidad.text, "-", entidad.label_)
 
 
-        for new in News.objects.all()[:9]:
+        # Extracción de palabras clave (sustantivos y adjetivos)
+        palabras_clave = [token for token in doc if token.pos_ in ['NOUN', 'ADJ']]
 
-            texto = new.title
-            print("\n\n ",texto)
-            # Procesamiento del texto
-            doc = nlp(texto)
+        # Búsqueda de sinónimos
+        sinonimos = defaultdict(list)
+        for palabra in palabras_clave:
+            synsets = wn.synsets(palabra.text, lang='spa')
+            for synset in synsets:
+                for lemma in synset.lemmas(lang='spa'):
+                    sinonimo = lemma.name()
+                    if sinonimo != palabra.text and sinonimo not in sinonimos[palabra.text]:
+                        sinonimos[palabra.text].append(sinonimo)
 
-            # Tokenización
-            print("Tokenización:")
-            for token in doc:
-                print(token.text)
-
-            # Análisis de entidades
-            print("\nEntidades:")
-            for entidad in doc.ents:
-                print(entidad.text, "-", entidad.label_)
-
+        # Resultados
+        print("Palabras clave y sinónimos:")
+        for palabra, sinonimos_palabra in sinonimos.items():
+            print(f"{palabra}: {', '.join(sinonimos_palabra)}")
+            
+        # Resultado de clasificacion
+        texto_procesado = vectorizer.transform([texto])
+        resultado = clf.predict(texto_procesado)
+        print("\n", texto, "es un: ")
+        print(resultado)
+            
+                
         return HttpResponse("validar noticias")
      
