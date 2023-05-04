@@ -17,7 +17,10 @@ from .identifyModel.SVM import clf, vectorizer
 from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
-    return render(request, 'index.html')
+    
+    return render(request, 'index.html', {
+        "articles": News.objects.all()
+    })
     
 
 def news(request):
@@ -203,7 +206,7 @@ def valid_new(request):
         # Carga del modelo en español
         nlp = spacy.load("es_core_news_sm")
 
-        texto = request.POST["text"]
+        texto = request.POST["texto"]
         print(texto)
         # Procesamiento del texto
         doc = nlp(texto)
@@ -243,10 +246,4 @@ def valid_new(request):
         print("\n", texto, "es un: ")
         print(resultado)
             
-                
-        return HttpResponse("validar noticias")
-
-
-
-    
-
+        return redirect('get_news:index')
