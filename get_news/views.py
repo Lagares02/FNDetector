@@ -210,7 +210,7 @@ def valid_new(request):
         print(texto)
         # Procesamiento del texto
         doc = nlp(texto)
-        """
+
         # Tokenización
         print("Tokenización:")
         for token in doc:
@@ -239,7 +239,7 @@ def valid_new(request):
         print("Palabras clave y sinónimos:")
         for palabra, sinonimos_palabra in sinonimos.items():
             print(f"{palabra}: {', '.join(sinonimos_palabra)}")
-        """    
+  
         # Resultado de clasificacion
         result = predict(texto)
         print(result)
