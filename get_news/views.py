@@ -13,7 +13,7 @@ import nltk
 nltk.download('wordnet')
 from nltk.corpus import wordnet as wn
 from collections import defaultdict
-from .identifyModel.SVM import clf, vectorizer
+from .identifyModel.SVM import predict
 from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
@@ -210,7 +210,7 @@ def valid_new(request):
         print(texto)
         # Procesamiento del texto
         doc = nlp(texto)
-
+        """
         # Tokenización
         print("Tokenización:")
         for token in doc:
@@ -239,11 +239,9 @@ def valid_new(request):
         print("Palabras clave y sinónimos:")
         for palabra, sinonimos_palabra in sinonimos.items():
             print(f"{palabra}: {', '.join(sinonimos_palabra)}")
-            
+        """    
         # Resultado de clasificacion
-        texto_procesado = vectorizer.transform([texto])
-        resultado = clf.predict(texto_procesado)
-        print("\n", texto, "es un: ")
-        print(resultado)
+        result = predict(texto)
+        print(result)
             
-        return redirect('get_news:index')
+        return render(request, 'index.html', {'result': result})
