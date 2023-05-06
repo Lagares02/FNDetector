@@ -2,7 +2,6 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
 
 # Leer dataset desde un archivo CSV
 df = pd.read_csv('get_news/Dataset/dataset.csv', header=None, names=['texto', 'clase'])
@@ -21,9 +20,6 @@ clf.fit(X_train, y_train)
 
 # Evaluar modelo en conjunto de prueba
 y_pred = clf.predict(X_test)
-#print("Accuracy:", accuracy_score(y_test, y_pred))
-#print("Classification Report:")
-#print(classification_report(y_test, y_pred))
 
 # Utilizar modelo para clasificar nuevos textos
 def predict(texto):
