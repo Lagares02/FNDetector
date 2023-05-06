@@ -30,6 +30,9 @@ def predict(texto):
     texto_vec = vectorizer.transform([texto])
     proba = clf.predict_proba(texto_vec)[0][1]
     if proba > 0.5:
-        return f"El texto '{texto}' es un titular, con una probabilidad de {proba*100:.2f}%"
+        resultado = "Es un titular"
+        porcentaje = f"{proba*100:.2f}"
     else:
-        return f"El texto '{texto}' no es un titular, con una probabilidad de {100-proba*100:.2f}%"
+        resultado = "No es un titular"
+        porcentaje = f"{100-proba*100:.2f}"
+    return ({'resultado': resultado, 'porcentaje': porcentaje})
