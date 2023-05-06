@@ -25,7 +25,7 @@ y_pred = clf.predict(X_test)
 def predict(texto):
     texto_vec = vectorizer.transform([texto])
     proba = clf.predict_proba(texto_vec)[0][1]
-    if proba > 0.5:
+    if proba > 0.7:
         resultado = "Es un titular"
         porcentaje = f"{proba*100:.2f}"
     else:
