@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('get_news/', views.news, name="get_news"),
     path('valid/', views.valid_new, name="valid"),
+    path('verificar/', views.verificar, name='verificar'),
 ]

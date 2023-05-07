@@ -24,7 +24,6 @@
     </style>
 </head>
 <body style="background-color: rgba(0, 0, 0, 0.9);">   
-
         <section class="py-2 text-center container ">
           <div class="container col-xl-10 col-xxl-8 px-4 ">
             <div class="row align-items-center g-lg-5 py-5">
@@ -149,6 +148,33 @@
                   </div>
                 </div>
                 <div class="col"></div>
+            </div>
+            <p>
+            <div class="container">
+              {% if result.resultado == "Es un titular" %}
+                <table class="table table-bordered border-light">
+                  <thead>
+                    <tr>
+                      <th scope="col" style="color: white;">#</th>
+                      <th scope="col" style="color: white;">Titulares similares</th>
+                    </tr>
+                  </thead>
+                  <tbody class="table-group-divider">
+                    {% for noticia in similares %}
+                        <tr>
+                            <th scope="row" style="color: white;">{{ forloop.counter }}</th>
+                            <td style="color: white;">{{ noticia.title }}</td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <p>
+                {% if similares %}
+                  <div class="container">
+                    <a href="{% url 'get_news:verificar' %}" class="btn btn-secondary" style="background-image: linear-gradient(to right, #8916b2, #1870bd); color: #FFFFFF; border: none;">Verificar noticias</a>
+                  </div>
+                {% endif %}
+              {% endif %}
             </div>
         </form>
         

@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
+from django.db.models import Q
 
 
 import feedparser
@@ -22,7 +23,9 @@ def index(request):
     return render(request, 'index.html', {
         "articles": News.objects.all()
     })
-    
+        
+def verificar(request):
+    return render(request, 'verificar.html')
 
 def news(request):
     # URLs de los feeds RSS
@@ -244,5 +247,27 @@ def valid_new(request):
         # Resultado de clasificacion
         result = predict(texto)
         print(result)
-            
-        return render(request, 'index.html', {'result': result})
+        
+        # Buscar noticias similares
+        similares = set()  # Usar un conjunto en lugar de una lista
+        for palabra, sinonimos_palabra in sinonimos.items():
+            for sinonimo in sinonimos_palabra:
+                noticias_similares = News.objects.filter(Q(description__icontains=palabra) | Q(description__icontains=sinonimo)).exclude(status=True)
+                for noticia in noticias_similares:
+                    similares.add((noticia.title, noticia.url))
+                    noticia.status = True
+                    noticia.save()
+
+        for entidad in doc.ents:
+            noticias_similares = News.objects.filter(title__icontains=entidad.text).exclude(status=True)
+            for noticia in noticias_similares:
+                similares.add((noticia.title, noticia.url))
+                noticia.status = True
+                noticia.save()
+
+        # Convertir el conjunto en una lista
+        similares = [{'title': title, 'url': url} for title, url in similares]
+                
+        print(similares)
+
+        return render(request, 'index.html', {'result': result, 'similares': similares})
