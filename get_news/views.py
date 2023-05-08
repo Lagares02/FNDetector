@@ -13,19 +13,47 @@ import spacy
 import nltk
 nltk.download('wordnet')
 nltk.download('omw-1.4')
+nltk.download('punkt')
 from nltk.corpus import wordnet as wn
+from nltk.metrics import jaccard_distance
+from nltk.tokenize import word_tokenize
 from collections import defaultdict
 from .identifyModel.SVM import predict
 from django.views.decorators.csrf import csrf_exempt
+
 
 def index(request):
     
     return render(request, 'index.html', {
         "articles": News.objects.all()
     })
-        
+    
 def verificar(request):
-    return render(request, 'verificar.html')
+    # Obtener el último titular ingresado por el usuario
+    ultimo_texto = request.session.get('titulares', [])[-1]
+
+    # Obtener las noticias similares correspondientes al último titular ingresado por el usuario
+    similares = []
+    noticias_similares = News.objects.filter(Q(title__icontains=ultimo_texto) & Q(verificado=False))
+    for noticia in noticias_similares:
+        # Calcular la similitud de Jaccard
+        noticia_tokens = set(word_tokenize(noticia.description))
+        similitud = 100 * (1 - jaccard_distance(set(word_tokenize(ultimo_texto)), noticia_tokens))
+
+        # Agregar la noticia al diccionario
+        similares.append({'title': noticia.title, 'similarity': similitud, 'url': noticia.url})
+
+        # Marcar la noticia como verificada
+        noticia.verificado = True
+        noticia.save()
+
+    # Agregar las noticias similares a la sesión del usuario
+    request.session['similares'] = similares
+
+    # Renderizar el template de verificar.html con las noticias similares correspondientes
+    return render(request, 'verificar.html', {'similares': similares})
+
+
 
 def news(request):
     # URLs de los feeds RSS
@@ -206,12 +234,11 @@ def news(request):
 
 @csrf_exempt
 def valid_new(request):
-     if request.method =="POST":
+     if request.method == "POST":
         # Carga del modelo en español
         nlp = spacy.load("es_core_news_sm")
 
         texto = request.POST["texto"]
-        print(texto)
         # Procesamiento del texto
         doc = nlp(texto)
 
@@ -224,7 +251,6 @@ def valid_new(request):
         print("\nEntidades:")
         for entidad in doc.ents:
             print(entidad.text, "-", entidad.label_)
-
 
         # Extracción de palabras clave (sustantivos y adjetivos)
         palabras_clave = [token for token in doc if token.pos_ in ['NOUN', 'ADJ']]
@@ -248,26 +274,58 @@ def valid_new(request):
         result = predict(texto)
         print(result)
         
+        # Agregar el titular a la sesión del usuario
+        if 'titulares' not in request.session:
+            request.session['titulares'] = []
+        request.session['titulares'].append(texto)
+
+        
         # Buscar noticias similares
-        similares = set()  # Usar un conjunto en lugar de una lista
+        similares = {}  # Usar un diccionario en lugar de una lista o un conjunto
         for palabra, sinonimos_palabra in sinonimos.items():
             for sinonimo in sinonimos_palabra:
-                noticias_similares = News.objects.filter(Q(description__icontains=palabra) | Q(description__icontains=sinonimo)).exclude(status=True)
+                noticias_similares = News.objects.filter(Q(description__icontains=palabra) | Q(description__icontains=sinonimo), status=False, verificado=False)
                 for noticia in noticias_similares:
-                    similares.add((noticia.title, noticia.url))
+                    # Calcular la similitud de Jaccard
+                    noticia_tokens = set(word_tokenize(noticia.description))
+                    similitud = 100 * (1 - jaccard_distance(set(palabras_clave), noticia_tokens))
+                    
+                    # Agregar la noticia al diccionario si no existe o actualizar la similitud si ya existe
+                    if noticia.url not in similares:
+                        similares[noticia.url] = {'title': noticia.title, 'url': noticia.url, 'similarity': similitud}
+                    else:
+                        similares[noticia.url]['similarity'] = max(similitud, similares[noticia.url]['similarity'])
+                    
+                    # Marcar la noticia como verificada
                     noticia.status = True
+                    noticia.verificado = True 
                     noticia.save()
 
         for entidad in doc.ents:
-            noticias_similares = News.objects.filter(title__icontains=entidad.text).exclude(status=True)
+            noticias_similares = News.objects.filter(title__icontains=entidad.text, status=False, verificado=False)
             for noticia in noticias_similares:
-                similares.add((noticia.title, noticia.url))
+                # Calcular la similitud de Jaccard
+                noticia_tokens = set(word_tokenize(noticia.description))
+                similitud = 100 * (1 - jaccard_distance(set([entidad.text]), noticia_tokens))
+                    
+                # Agregar la noticia al diccionario si no existe o actualizar la similitud si ya existe
+                if noticia.url not in similares:
+                    similares[noticia.url] = {'title': noticia.title, 'url': noticia.url, 'similarity': similitud}
+                else:
+                    similares[noticia.url]['similarity'] = max(similitud, similares[noticia.url]['similarity'])
+                    
+                # Marcar la noticia como verificada
                 noticia.status = True
+                noticia.verificado = True 
                 noticia.save()
-
-        # Convertir el conjunto en una lista
-        similares = [{'title': title, 'url': url} for title, url in similares]
                 
+        similares = sorted(similares.values(), key=lambda k: k['similarity'], reverse=True)[:10]
+        
+        if 'similares' not in request.session:
+            request.session['similares'] = []
+        request.session['similares'] = similares
+
         print(similares)
 
         return render(request, 'index.html', {'result': result, 'similares': similares})
+

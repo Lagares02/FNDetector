@@ -7,6 +7,7 @@ class News(models.Model):
     public_date = models.DateTimeField(auto_now=False, auto_now_add=False)
     image = models.URLField(max_length=300, default=None)
     status = models.BooleanField(default=False)
+    verificado = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.title

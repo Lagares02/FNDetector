@@ -31,21 +31,26 @@
             <thead>
                 <tr>
                     <th scope="col" style="color: white;">#</th>
-                    <th scope="col" style="color: white;">Titulares muy similares</th>
+                    <th scope="col" style="color: white;">Titulares</th>
                     <th scope="col" style="color: white;">Porcentaje</th>
                     <th scope="col" style="color: white;">URL</th>
                 </tr>
             </thead>
-                <tbody class="table-group-divider">
-                    {% for noticia in similares %}
-                        <tr>
-                            <th scope="row" style="color: white;">{{ forloop.counter }}</th>
-                            <td style="color: white;">{{ noticia.title }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
+            <tbody>
+                {% for noticia in similares %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ noticia.title }}</td>
+                    <td>{{ noticia.similarity }}%</td>
+                    <td><a href="{{ noticia.url }}" target="_blank">{{ noticia.url }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
+
+
+
         
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
