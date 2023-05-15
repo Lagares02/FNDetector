@@ -11,9 +11,9 @@ from .models import News
 
 import spacy
 import nltk
-nltk.download('wordnet')
-nltk.download('omw-1.4')
-nltk.download('punkt')
+#nltk.download('wordnet')
+#nltk.download('omw-1.4')
+#nltk.download('punkt')
 from nltk.corpus import wordnet as wn
 from nltk.metrics import jaccard_distance
 from nltk.tokenize import word_tokenize
@@ -22,38 +22,8 @@ from .identifyModel.SVM import predict
 from django.views.decorators.csrf import csrf_exempt
 
 
-def index(request):
-    
-    return render(request, 'index.html', {
-        "articles": News.objects.all()
-    })
-    
-def verificar(request):
-    # Obtener el último titular ingresado por el usuario
-    ultimo_texto = request.session.get('titulares', [])[-1]
-
-    # Obtener las noticias similares correspondientes al último titular ingresado por el usuario
-    similares = []
-    noticias_similares = News.objects.filter(Q(title__icontains=ultimo_texto) & Q(verificado=False))
-    for noticia in noticias_similares:
-        # Calcular la similitud de Jaccard
-        noticia_tokens = set(word_tokenize(noticia.description))
-        similitud = 100 * (1 - jaccard_distance(set(word_tokenize(ultimo_texto)), noticia_tokens))
-
-        # Agregar la noticia al diccionario
-        similares.append({'title': noticia.title, 'similarity': similitud, 'url': noticia.url})
-
-        # Marcar la noticia como verificada
-        noticia.verificado = True
-        noticia.save()
-
-    # Agregar las noticias similares a la sesión del usuario
-    request.session['similares'] = similares
-
-    # Renderizar el template de verificar.html con las noticias similares correspondientes
-    return render(request, 'verificar.html', {'similares': similares})
-
-
+def index(request): 
+    return render(request, 'index.html')
 
 def news(request):
     # URLs de los feeds RSS
@@ -327,5 +297,5 @@ def valid_new(request):
 
         print(similares)
 
-        return render(request, 'index.html', {'result': result, 'similares': similares})
+        return render(request, 'verificar.html', {'result': result, 'similares': similares})
 
