@@ -244,9 +244,9 @@ def valid_new(request):
                     
                     # Agregar la noticia al diccionario si no existe o actualizar la similitud si ya existe
                     if noticia['url'] not in similares:
-                        similares[noticia['url']] = {'title': noticia['title'], 'url': noticia['url'], 'similarity': similitud}
+                        similares[noticia['url']] = {'title': noticia['title'], 'url': noticia['url'], 'similarity': round(similitud, 3)}
                     else:
-                        similares[noticia['url']]['similarity'] = max(similitud, similares[noticia['url']]['similarity'])
+                        similares[noticia['url']]['similarity'] = max(round(similitud, 3), similares[noticia['url']]['similarity'])
 
         # Búsqueda de noticias similares para las entidades reconocidas
         for entidad in doc.ents:
@@ -267,9 +267,9 @@ def valid_new(request):
                 
                 # Agregar la noticia al diccionario si no existe o actualizar la similitud si ya existe
                 if noticia['url'] not in similares:
-                    similares[noticia['url']] = {'title': noticia['title'], 'url': noticia['url'], 'similarity': similitud}
+                    similares[noticia['url']] = {'title': noticia['title'], 'url': noticia['url'], 'similarity': round(similitud, 3)}
                 else:
-                    similares[noticia['url']]['similarity'] = max(similitud, similares[noticia['url']]['similarity'])
+                    similares[noticia['url']]['similarity'] = max(round(similitud, 3), similares[noticia['url']]['similarity'])
 
         similares = sorted(similares.values(), key=lambda k: k['similarity'], reverse=True)[:10]
 
