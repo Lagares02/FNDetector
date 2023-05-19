@@ -44,6 +44,8 @@ INSTALLED_APPS = [
 
 ]
 
+NEWS_JSON_FILE = 'db.json'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -52,10 +54,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.http.ConditionalGetMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 # Configuración de sesión
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Backend de sesión utilizando la base de datos
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 SESSION_COOKIE_NAME = 'nombre_cookie'  # Nombre de la cookie de sesión (personalizable)
 SESSION_COOKIE_AGE = 86400  # Duración de la cookie de sesión en segundos (aquí, un día)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Indica si la sesión expira al cerrar el navegador
@@ -85,13 +89,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
+DATABASES = {}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
