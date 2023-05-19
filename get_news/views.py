@@ -61,15 +61,6 @@ def news(request):
         'https://www.eltiempo.com/rss/economia_sectores.xml',
         'https://www.eltiempo.com/rss/economia_sector-financiero.xml',
 
-            # deportes 
-        'https://www.eltiempo.com/rss/deportes.xml ',
-        'https://www.eltiempo.com/rss/deportes_futbol-internacional.xml ',
-        'https://www.eltiempo.com/rss/deportes_futbol-colombiano.xml ',
-        'https://www.eltiempo.com/rss/deportes_tenis.xml',
-        'https://www.eltiempo.com/rss/deportes_ciclismo.xml',
-        'https://www.eltiempo.com/rss/deportes_automovilismo.xml',
-        'https://www.eltiempo.com/rss/deportes_otros-deportes.xml',
-
         # BBC
             # Últimas Noticias: 
         'http://www.bbc.co.uk/mundo/ultimas_noticias/index.xml',
@@ -94,15 +85,6 @@ def news(request):
 
             # Cultura: 
         'http://www.bbc.co.uk/mundo/temas/cultura/index.xml',
-
-            # Video: 
-        'http://www.bbc.co.uk/mundo/temas/video/index.xml',
-
-            # Fotos: 
-        'http://www.bbc.co.uk/mundo/temas/fotos/index.xml',
-
-            # Aprenda Inglés: 
-        'http://www.bbc.co.uk/mundo/temas/aprenda_ingles/index.xml',
         
         # portafolio.co
             # Economia
@@ -147,23 +129,9 @@ def news(request):
             # Vivienda
         'http://portafolio.co/rss/mis-finanzas/vivienda',
         
-            # Opinión
-        'http://portafolio.co/rss/opinion',
-        
-            # Editorial
-        'http://portafolio.co/rss/opinion/editorial',
-        
             # Tendencias
         'http://portafolio.co/rss/tendencias',
         
-            # Entretenimiento
-        'http://portafolio.co/rss/tendencias/entretenimiento',
-        
-            # Sociales
-        'http://portafolio.co/rss/tendencias/sociales',
-        
-            # Lujo
-        'http://portafolio.co/rss/tendencias/lujo'
     ]
 
     noticias = []
