@@ -230,9 +230,11 @@ def valid_new(request):
         print("\nEntidades:")
         for entidad in doc.ents:
             print(entidad.text, "-", entidad.label_)
+            
+        conectores_ignorar = ["el", "la", "los", "las", "de", "del", "al", "a", "ante", "bajo", "cabe", "con", "contra", "desde", "en", "entre", "hacia", "hasta", "para", "por", "según", "sin", "sobre", "tras", "durante", "mediante", "versus", "vía", "excepto", "incluso", "más", "menos", "salvo", "donde", "cuando", "si", "pero", "aunque", "como", "porque", "pues", "ya", "o", "u", "siempre", "jamás", "nunca", "también", "además", "asimismo", "sin embargo", "no obstante", "por lo tanto", "entonces", "por ende", "por consiguiente", "así que", "así pues", "por eso", "por esta razón", "por esa razón", "por este motivo", "por ese motivo", "en conclusión"]
 
-        # Extracción de palabras clave (sustantivos y adjetivos)
-        palabras_clave = [token for token in doc if token.pos_ in ['NOUN', 'ADJ']]
+        # Extracción de palabras clave (sustantivos y adjetivos) y eliminación de conectores
+        palabras_clave = [token for token in doc if token.pos_ in ['NOUN', 'ADJ'] and token.text.lower() not in conectores_ignorar]
 
         # Búsqueda de sinónimos
         sinonimos = defaultdict(list)
@@ -265,35 +267,41 @@ def valid_new(request):
             for sinonimo in sinonimos_palabra:
                 with open('db.json', 'r', encoding='utf-8') as json_file:
                     noticias = json.load(json_file)
-                
+                    
                 for noticia in noticias:
-                    if palabra in noticia['description'].lower() or sinonimo in noticia['description'].lower():
-                        # Calcular la similitud de Jaccard
-                        noticia_tokens = set(word_tokenize(noticia['description']))
-                        similitud = 100 * (1 - jaccard_distance(set(palabras_clave), noticia_tokens))
-                        
-                        # Agregar la noticia al diccionario si no existe o actualizar la similitud si ya existe
-                        if noticia['url'] not in similares:
-                            similares[noticia['url']] = {'title': noticia['title'], 'url': noticia['url'], 'similarity': similitud}
-                        else:
-                            similares[noticia['url']]['similarity'] = max(similitud, similares[noticia['url']]['similarity'])
-
-        # Búsqueda de noticias similares para las entidades reconocidas
-        for entidad in doc.ents:
-            with open('db.json', 'r', encoding='utf-8') as json_file:
-                noticias = json.load(json_file)
-            
-            for noticia in noticias:
-                if entidad.text.lower() in noticia['title'].lower():
-                    # Calcular la similitud de Jaccard
-                    noticia_tokens = set(word_tokenize(noticia['description']))
-                    similitud = 100 * (1 - jaccard_distance(set([entidad.text]), noticia_tokens))
-                        
+                    noticia_tokens = set(word_tokenize(noticia['title'].lower()))  # Tokenización del título de la noticia en minúsculas
+                    
+                    num_palabras_similares = sum(1 for token in doc if token.text.lower() in noticia_tokens)
+                    similitud = (num_palabras_similares / len(noticia_tokens)) * 100  # Calcular similitud en función del número de palabras similares
+                    
                     # Agregar la noticia al diccionario si no existe o actualizar la similitud si ya existe
                     if noticia['url'] not in similares:
                         similares[noticia['url']] = {'title': noticia['title'], 'url': noticia['url'], 'similarity': similitud}
                     else:
                         similares[noticia['url']]['similarity'] = max(similitud, similares[noticia['url']]['similarity'])
+
+        # Búsqueda de noticias similares para las entidades reconocidas
+        for entidad in doc.ents:
+            entidad_tokens = set(word_tokenize(entidad.text.lower()))  # Tokenización de la entidad en minúsculas
+            
+            with open('db.json', 'r', encoding='utf-8') as json_file:
+                noticias = json.load(json_file)
+            
+            for noticia in noticias:
+                noticia_tokens = set(word_tokenize(noticia['title'].lower()))  # Tokenización del título de la noticia en minúsculas
+                
+                # Verificar si la entidad está presente en el título de la noticia
+                if entidad.text.lower() in noticia['title'].lower():
+                    num_palabras_similares = sum(1 for token in entidad_tokens if token in noticia_tokens)
+                    similitud = (num_palabras_similares / len(noticia_tokens)) * 100  # Calcular similitud en función del número de palabras similares
+                else:
+                    similitud = 0  # Establecer similitud como cero si la entidad no está en el título
+                
+                # Agregar la noticia al diccionario si no existe o actualizar la similitud si ya existe
+                if noticia['url'] not in similares:
+                    similares[noticia['url']] = {'title': noticia['title'], 'url': noticia['url'], 'similarity': similitud}
+                else:
+                    similares[noticia['url']]['similarity'] = max(similitud, similares[noticia['url']]['similarity'])
 
         similares = sorted(similares.values(), key=lambda k: k['similarity'], reverse=True)[:10]
 
