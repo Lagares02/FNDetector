@@ -54,6 +54,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Configuración de sesión
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Backend de sesión utilizando la base de datos
+SESSION_COOKIE_NAME = 'nombre_cookie'  # Nombre de la cookie de sesión (personalizable)
+SESSION_COOKIE_AGE = 86400  # Duración de la cookie de sesión en segundos (aquí, un día)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Indica si la sesión expira al cerrar el navegador
+SESSION_SAVE_EVERY_REQUEST = True  # Guarda la sesión en cada solicitud, incluso si no se ha modificado
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

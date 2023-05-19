@@ -1,5 +1,4 @@
 from django.shortcuts import render, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
 from django.db.models import Q
 
@@ -202,7 +201,7 @@ def news(request):
 
     return HttpResponse(f"Recibidos {i} artículos.")
 
-@csrf_exempt
+
 def valid_new(request):
      if request.method == "POST":
         # Carga del modelo en español
