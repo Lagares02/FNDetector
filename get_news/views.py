@@ -277,6 +277,6 @@ def valid_new(request):
             request.session['similares'] = []
         request.session['similares'] = similares
 
-        #print(similares)
+        print(similares)
 
         return render(request, 'verificar.html', {'result': result, 'similares': similares})
