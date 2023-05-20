@@ -1,21 +1,18 @@
 from django.shortcuts import render, HttpResponse
-from django.db import IntegrityError
-from django.db.models import Q
+from django.views.decorators.csrf import csrf_protect
+
 
 
 import feedparser
 from datetime import datetime
 
-from .models import News
-
 import spacy
 import json
 import nltk
-#nltk.download('wordnet')
-#nltk.download('omw-1.4')
-#nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+nltk.download('punkt')
 from nltk.corpus import wordnet as wn
-from nltk.metrics import jaccard_distance
 from nltk.tokenize import word_tokenize
 from collections import defaultdict
 from .identifyModel.SVM import predict
@@ -180,6 +177,7 @@ def news(request):
     return HttpResponse(f"Recibidos {i} artículos.")
 
 
+@csrf_protect
 def valid_new(request):
      if request.method == "POST":
         # Carga del modelo en español
