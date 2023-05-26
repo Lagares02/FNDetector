@@ -177,7 +177,7 @@ def news(request):
     return HttpResponse(f"Recibidos {i} artículos.")
 
 
-@csrf_protect
+@csrf_exempt
 def valid_new(request):
      if request.method == "POST":
         # Carga del modelo en español
